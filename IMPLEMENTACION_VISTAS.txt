@@ -1,0 +1,78 @@
+IMPLEMENTACIÓN DE VISTAS THYMELEAF - SISTEMA DE RESERVAS DE VIAJES (ESTRUCTURADO)
+
+1. VISTAS DISPONIBLES
+---------------------
+- reservar.html              → Formulario para crear reserva con usuarioId y viajeId
+- listar_reservas.html       → Lista de reservas de un usuario (requiere lista 'reservas')
+- listar_viajes.html         → Lista de todos los viajes (requiere lista 'viajes')
+- lista_viajes_avanzada.html → Vista avanzada con lógica condicional (capacidad > 0)
+
+2. UBICACIÓN DE LAS VISTAS
+--------------------------
+Todas las vistas deben estar en:
+src/main/resources/templates/
+
+3. CONTROLADORES PARA VISTAS
+----------------------------
+Ubicados en el paquete:
+com.miempresa.sistema.controller
+
+VistaController.java debe incluir los siguientes métodos:
+
+@Controller
+public class VistaController {
+    @Autowired
+    private ReservaService reservaService;
+    @Autowired
+    private ViajeService viajeService;
+
+    @GetMapping("/reservar")
+    public String formularioReserva() {
+        return "reservar";
+    }
+
+    @GetMapping("/mis-reservas")
+    public String verReservas(Model model) {
+        List<Reserva> reservas = reservaService.listarPorUsuario(1L);
+        model.addAttribute("reservas", reservas);
+        return "listar_reservas";
+    }
+
+    @GetMapping("/viajes")
+    public String verViajes(Model model) {
+        List<Viaje> viajes = viajeService.listarTodos();
+        model.addAttribute("viajes", viajes);
+        return "listar_viajes";
+    }
+
+    @GetMapping("/viajes-avanzado")
+    public String verViajesAvanzado(Model model) {
+        List<Viaje> viajes = viajeService.listarTodos();
+        model.addAttribute("viajes", viajes);
+        model.addAttribute("usuarioId", 1L); // simulado
+        return "lista_viajes_avanzada";
+    }
+}
+
+4. ESTRUCTURA DE PAQUETES RECOMENDADA
+-------------------------------------
+- com.miempresa.sistema.model       → Clases de dominio (Usuario, Viaje, Reserva)
+- com.miempresa.sistema.controller  → Controladores (ReservaController, VistaController)
+- com.miempresa.sistema.service     → Servicios (ReservaService, ViajeService)
+- com.miempresa.sistema.repository  → Repositorios (ReservaRepository, etc.)
+
+5. DEPENDENCIAS NECESARIAS EN POM.XML
+--------------------------------------
+- spring-boot-starter-thymeleaf
+- spring-boot-starter-web
+- spring-boot-starter-data-jpa
+- mysql-connector-j
+- jakarta.persistence-api
+
+6. PRUEBAS EN LOCAL
+-------------------
+Iniciar Spring Boot localmente:
+http://localhost:8080/reservar
+http://localhost:8080/mis-reservas
+http://localhost:8080/viajes
+http://localhost:8080/viajes-avanzado

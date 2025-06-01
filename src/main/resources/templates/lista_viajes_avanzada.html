@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Viajes Disponibles</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 40px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #ccc;
+        }
+
+        th {
+            background-color: #142f4e;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .success {
+            color: green;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .error {
+            color: red;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        button {
+            background-color: #142f4e;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #142f4e;
+        }
+
+        .no-disponible {
+            color: gray;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Lista de Viajes</h1>
+
+    <!-- Mostrar mensaje si la lista está vacía -->
+    <div th:if="${error}" class="error" th:text="${error}"></div>
+    <div th:if="${success}" class="success" th:text="${success}"></div>
+
+    <!-- Mensaje si no hay viajes -->
+    <div th:if="${#lists.isEmpty(viajes)}">
+        <p style="text-align: center;">No hay viajes disponibles en este momento.</p>
+    </div>
+
+    <table th:if="${not #lists.isEmpty(viajes)}" border="1">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Origen</th>
+            <th>Destino</th>
+            <th>Fecha</th>
+            <th>Hora</th>
+            <th>Capacidad</th>
+            <th>Estado</th>
+            <th>Acción</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="viaje : ${viajes}">
+            <td th:text="${viaje.id}">1</td>
+            <td th:text="${viaje.origen}">Piura</td>
+            <td th:text="${viaje.destino}">Lima</td>
+            <td th:text="${viaje.fecha}">2025-08-01</td>
+            <td th:text="${viaje.hora}">08:00</td>
+            <td th:text="${viaje.autobus.capacidad}">40</td>
+
+            <!-- Estado: Disponible o Sin cupos -->
+            <td th:text="${viaje.cuposDisponibles > 0 ? 'Disponible' : 'Sin cupos'}"
+                th:style="${viaje.cuposDisponibles > 0} ? 'color: green;' : 'color: red;'">
+            </td>
+
+            <!-- Acción: botón Reservar si hay cupos -->
+            <td>
+                <button type="button"
+                        th:if="${viaje.cuposDisponibles > 0}"
+                        th:onclick="'reservar(' + ${usuarioId} + ',' + ${viaje.id} + ')'">
+                    Reservar
+                </button>
+                <span th:if="${viaje.cuposDisponibles == 0}" style="color: gray;">No disponible</span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <script>
+    function reservar(usuarioId, viajeId) {
+    fetch(`/api/reservas/crear?usuarioId=${usuarioId}&viajeId=${viajeId}`, {
+    method: 'POST'
+    })
+    .then(res => {
+    if (!res.ok) {
+    return res.text().then(text => { throw new Error(text); });
+    }
+    return res.json();
+    })
+    .then(data => {
+    alert("Reserva realizada con éxito");
+    window.location.reload(); // recarga para actualizar capacidad y estado
+    })
+    .catch(err => {
+    alert(err.message || "Error al reservar. Intente nuevamente.");
+    window.location.reload(); // recarga para actualizar lista y ver "Sin cupos"
+    });
+    }
+    </script>
+
+</body>
+</html>

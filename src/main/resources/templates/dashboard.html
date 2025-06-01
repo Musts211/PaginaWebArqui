@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel Principal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            padding: 40px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #04101d;
+        }
+
+        .button-container {
+            margin-top: 30px;
+        }
+
+        button {
+            background-color: #142f4e;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            margin: 10px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #134473;
+        }
+
+        .admin-section {
+            margin-top: 40px;
+            border-top: 1px solid #ccc;
+            padding-top: 20px;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 30px;
+            color: #e74c3c;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<h1 th:text="'Bienvenido, ' + ${usuario.nombre}">Bienvenido</h1>
+<p>Has iniciado sesión correctamente.</p>
+
+<!-- Botones de navegación -->
+<button th:onclick="'location.href=\'/viajes?usuarioId=' + ${usuario.id} + '\''">Ver Viajes Disponibles</button>
+<button th:onclick="'location.href=\'/mis-reservas\''">Ver Mis Reservas</button>
+<button th:onclick="'location.href=\'/reservar?usuarioId=' + ${usuario.id} + '\''">Reservar un Viaje</button>
+
+<!-- Solo visible si el usuario es ADMIN -->
+<div th:if="${usuario.rol == 'admin'}">
+    <button onclick="location.href='/autobus/registro'">Registrar Autobús</button>
+    <button onclick="location.href='/chofer/registro'">Registrar Chofer</button>
+    <button onclick="location.href='/viajes/registro'">Registrar Viaje</button>
+</div>
+<br><br>
+<a href="/">Cerrar sesión / Ir al inicio</a>
+</body>
+</html>

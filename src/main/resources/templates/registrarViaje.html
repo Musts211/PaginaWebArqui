@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Registrar Viaje</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+        }
+
+        form {
+            background: white;
+            padding: 30px 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            width: 400px;
+        }
+
+        h2 {
+            color: #142f4e;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input[type="date"],
+        input[type="time"],
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 10px 12px;
+            margin-top: 6px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 14px;
+            color: #333;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="date"]:focus,
+        input[type="time"]:focus,
+        input[type="text"]:focus,
+        select:focus {
+            border-color: #142f4e;
+            outline: none;
+        }
+
+        button {
+            margin-top: 25px;
+            width: 100%;
+            padding: 12px;
+            background-color: #142f4e;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #142f4e;
+        }
+    </style>
+</head>
+<body>
+
+<form id="viajeForm">
+    <h2>Registrar Viaje</h2>
+    <label for="fecha">Fecha:</label>
+    <input type="date" id="fecha" name="fecha" required>
+
+    <label for="hora">Hora:</label>
+    <input type="time" id="hora" name="hora" required>
+
+    <label for="origen">Origen:</label>
+    <input type="text" id="origen" name="origen" required>
+
+    <label for="destino">Destino:</label>
+    <input type="text" id="destino" name="destino" required>
+
+    <label for="autobusSelect">Autobús:</label>
+    <select name="autobusId" id="autobusSelect" required></select>
+
+    <label for="choferSelect">Chofer:</label>
+    <select name="choferId" id="choferSelect" required></select>
+
+    <button type="submit">Registrar Viaje</button>
+</form>
+
+
+<script>
+    // Cargar autobuses
+    fetch('/api/todos-autobuses')
+        .then(res => res.json())
+        .then(data => {
+            const select = document.getElementById('autobusSelect');
+            data.forEach(auto => {
+                if (/^[A-Z]{2}-\d{4}$/.test(auto.placa)) { // Validación formato
+                    const option = document.createElement('option');
+                    option.value = auto.id;
+                    option.text = auto.placa + ' - Capacidad: ' + auto.capacidad;
+                    select.appendChild(option);
+                }
+            });
+        });
+
+    // Cargar choferes
+    fetch('/api/todos-choferes')
+        .then(res => res.json())
+        .then(data => {
+            const select = document.getElementById('choferSelect');
+            data.forEach(chofer => {
+                if (/^CH-\d{4}$/.test(chofer.codigo)) { // Validación formato
+                    const option = document.createElement('option');
+                    option.value = chofer.id;
+                    option.text = chofer.codigo + ' - ' + chofer.nombre;
+                    select.appendChild(option);
+                }
+            });
+        });
+
+    // Enviar viaje
+    document.getElementById("viajeForm").addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        const form = event.target;
+
+        const data = {
+            fecha: form.fecha.value,
+            hora: form.hora.value,
+            origen: form.origen.value,
+            destino: form.destino.value,
+            autobusId: form.autobusId.value,
+            choferId: form.choferId.value
+        };
+
+        fetch('/api/viajes', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+            .then(resp => {
+                if (!resp.ok) throw new Error("Error al registrar el viaje");
+                alert("Viaje registrado con éxito");
+                form.reset();
+            })
+            .catch(err => alert("Error: " + err.message));
+    });
+</script>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Registro de Usuario</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .registro-container {
+            background: #fff;
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            box-sizing: border-box;
+        }
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-weight: 700;
+        }
+        label {
+            display: block;
+            margin-top: 18px;
+            font-weight: 600;
+            color: #34495e;
+            font-size: 1rem;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px 15px;
+            margin-top: 8px;
+            border: 1.5px solid #ccc;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+        }
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 8px rgba(52, 152, 219, 0.4);
+        }
+        button {
+            margin-top: 30px;
+            width: 100%;
+            padding: 14px 0;
+            font-size: 1.1rem;
+            font-weight: 700;
+            background-color: #142f4e;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        p {
+            text-align: center;
+            margin-top: 20px;
+            color: #555;
+            font-size: 0.95rem;
+        }
+        a {
+            color: #142f4e;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="registro-container">
+    <h2>Registro de Usuario</h2>
+<form th:action="@{/registro}" th:object="${usuario}" method="post">
+    <label>Nombre:</label>
+    <input type="text" th:field="*{nombre}" required><br>
+
+    <label>Correo:</label>
+    <input type="email" th:field="*{email}" required><br>
+
+    <label>Teléfono:</label>
+    <input type="text" th:field="*{telefono}" required><br>
+
+    <label>Contraseña:</label>
+    <input type="password" th:field="*{contrasena}" required><br>
+
+    <button type="submit">Registrar</button>
+</form>
+<p>¿Ya tienes cuenta? <a th:href="@{/login}">Inicia sesión</a></p>
+</div>
+</body>
+</html>

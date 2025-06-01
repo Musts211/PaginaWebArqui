@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Reserva</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #fafafa;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+        }
+        form {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 12px rgba(0,0,0,0.1);
+            width: 320px;
+        }
+        h2 {
+            text-align: center;
+            color: #142f4e;
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: 600;
+            color: #555;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 8px 10px;
+            margin-top: 6px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+        input[type="number"]:focus {
+            border-color: #142f4e;
+            outline: none;
+        }
+        button {
+            margin-top: 25px;
+            width: 100%;
+            padding: 12px;
+            background-color: #142f4e;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #142f4e;
+        }
+        #mensaje {
+            margin-top: 15px;
+            font-weight: bold;
+            text-align: center;
+            min-height: 20px;
+            color: #d9534f; /* rojo para error */
+        }
+        #mensaje.exito {
+            color: #28a745; /* verde para éxito */
+        }
+    </style>
+</head>
+<body>
+
+
+<form id="reservaForm">
+    <h1>Reservar</h1>
+    <div id="mensaje" style="margin-top: 10px; font-weight: bold;"></div>
+    <label for="usuarioId">ID de Usuario:</label>
+    <input type="number" id="usuarioId" name="usuarioId" required><br><br>
+
+    <label for="viajeId">ID de Viaje:</label>
+    <input type="number" id="viajeId" name="viajeId" required><br><br>
+
+    <button type="button" id="reservarBtn" onclick="iniciarTemporizador()">Reservar</button>
+    <button type="button" id="cancelarBtn" style="display:none;" onclick="cancelarReserva()">Cancelar</button>
+</form>
+
+<script>
+    let temporizadorId;
+
+    function iniciarTemporizador() {
+        const usuarioId = document.getElementById('usuarioId').value;
+        const viajeId = document.getElementById('viajeId').value;
+        const mensajeDiv = document.getElementById('mensaje');
+
+        if (!usuarioId || !viajeId) {
+            mensajeDiv.innerText = "Por favor, complete ambos campos.";
+            return;
+        }
+
+        // Mostrar mensaje y botones
+        mensajeDiv.innerText = "La reserva se enviará en 1 minuto. Puedes cancelar si lo deseas.";
+        document.getElementById('reservarBtn').disabled = true;
+        document.getElementById('cancelarBtn').style.display = 'inline-block';
+
+        // Iniciar temporizador de 1 minuto
+        temporizadorId = setTimeout(() => {
+            enviarReserva(usuarioId, viajeId);
+        }, 60000); // 60 segundos
+    }
+
+    function cancelarReserva() {
+        clearTimeout(temporizadorId);
+        document.getElementById('mensaje').innerText = "Reserva cancelada.";
+        document.getElementById('reservarBtn').disabled = false;
+        document.getElementById('cancelarBtn').style.display = 'none';
+    }
+
+    function enviarReserva(usuarioId, viajeId) {
+        fetch('/api/reservas/crear?usuarioId=' + usuarioId + '&viajeId=' + viajeId, {
+            method: 'POST'
+        })
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById('mensaje').innerText = "Reserva realizada con éxito.";
+                    setTimeout(() => {
+                        window.location.href = '/mis-reservas';
+                    }, 2000);
+                } else {
+                    response.text().then(text => {
+                        document.getElementById('mensaje').innerText = "Hubo un problema al reservar: " + text;
+                    });
+                }
+            })
+            .catch(error => {
+                document.getElementById('mensaje').innerText = "Error en la reserva: " + error;
+            });
+
+        // Restaurar botones
+        document.getElementById('reservarBtn').disabled = false;
+        document.getElementById('cancelarBtn').style.display = 'none';
+    }
+</script>
+</body>
+</html>
